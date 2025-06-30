@@ -86,7 +86,7 @@ Saves content to a file, with environment-appropriate behavior.
 
 ## Contributing
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
+Please see [CONTRIBUTING guide](CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## Code of Conduct
 
