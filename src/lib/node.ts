@@ -1,10 +1,11 @@
+import path from "path";
+
 export async function nodeSave(
     filename: string,
     content: Blob | string | Buffer,
     savePath?: string
 ) {
-    const fs = await import("fs/promises");
-    const path = await import("path");
+    const fs = await import("fs/promises")
     const buffer =
         content instanceof Blob
             ? Buffer.from(await content.arrayBuffer())

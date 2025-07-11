@@ -3,6 +3,8 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import terser from "@rollup/plugin-terser";
+import nodePolyfills from "rollup-plugin-polyfill-node";
+import builtins from 'rollup-plugin-node-builtins';
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -16,7 +18,7 @@ export default [
             { file: "dist/index.esm.js", format: "esm", sourcemap: true },
             { file: "dist/index.cjs.js", format: "cjs", sourcemap: true },
         ],
-        plugins: [resolve(), commonjs(), typescript({ tsconfig: "./tsconfig.json" }), terser()],
+        plugins: [resolve(), commonjs(), typescript({ tsconfig: "./tsconfig.json" }), terser(), nodePolyfills(), builtins()],
         external: [...Object.keys(dependencies || {})],
     },
 
@@ -27,8 +29,12 @@ export default [
             format: "umd",
             name: "runtimeSave",
             sourcemap: true,
+            globals: {
+                "fs/promises": "fs", // this won't work at runtime but silences the warning
+            },
         },
-        plugins: [resolve({ browser: true }), commonjs(), typescript(), terser()],
+        plugins: [resolve({ browser: true }), commonjs(), typescript(), terser(), nodePolyfills(), builtins()],
+        // external: ["fs/promises"],
     },
 
     // Type declarations
