@@ -26,7 +26,7 @@ export default [
             },
         ],
         plugins: [resolve(), commonjs(), typescript({ tsconfig: "./tsconfig.json" }), terser()],
-        external: [...Object.keys(dependencies || {}), "fs/promises", "path"],
+        external: [...Object.keys(dependencies || {})],
     },
 
     {
@@ -39,7 +39,7 @@ export default [
             inlineDynamicImports: true,
         },
         plugins: [resolve({ browser: true }), commonjs(), typescript(), terser()],
-        external: [...Object.keys(dependencies || {}), "fs/promises", "path"],
+        external: [...Object.keys(dependencies || {})],
     },
 
     // Type declarations
