@@ -3,9 +3,6 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import terser from "@rollup/plugin-terser";
-import nodePolyfills from "rollup-plugin-polyfill-node";
-import builtins from 'rollup-plugin-node-builtins';
-
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { dependencies } = require("./package.json");
@@ -15,11 +12,21 @@ export default [
     {
         input: "src/index.ts",
         output: [
-            { file: "dist/index.esm.js", format: "esm", sourcemap: true },
-            { file: "dist/index.cjs.js", format: "cjs", sourcemap: true },
+            {
+                file: "dist/index.esm.js",
+                format: "esm",
+                sourcemap: true,
+                inlineDynamicImports: true,
+            },
+            {
+                file: "dist/index.cjs.js",
+                format: "cjs",
+                sourcemap: true,
+                inlineDynamicImports: true,
+            },
         ],
-        plugins: [resolve(), commonjs(), typescript({ tsconfig: "./tsconfig.json" }), terser(), nodePolyfills(), builtins()],
-        external: [...Object.keys(dependencies || {})],
+        plugins: [resolve(), commonjs(), typescript({ tsconfig: "./tsconfig.json" }), terser()],
+        external: [...Object.keys(dependencies || {}), "fs/promises", "path"],
     },
 
     {
@@ -29,12 +36,10 @@ export default [
             format: "umd",
             name: "runtimeSave",
             sourcemap: true,
-            globals: {
-                "fs/promises": "fs", // this won't work at runtime but silences the warning
-            },
+            inlineDynamicImports: true,
         },
-        plugins: [resolve({ browser: true }), commonjs(), typescript(), terser(), nodePolyfills(), builtins()],
-        // external: ["fs/promises"],
+        plugins: [resolve({ browser: true }), commonjs(), typescript(), terser()],
+        external: [...Object.keys(dependencies || {}), "fs/promises", "path"],
     },
 
     // Type declarations
