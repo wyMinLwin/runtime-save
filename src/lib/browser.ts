@@ -11,7 +11,7 @@ export async function browserSave(filename: string, content: Blob | string | Buf
                 })();
 
     // Prefer File System Access API if supported
-    if (window) {
+    if (typeof (window as unknown as ExtendedWindow)?.showSaveFilePicker == "function") {
         // Extract base MIME type
         const baseMimeType = (blob.type || "application/octet-stream").split(";")[0];
 
