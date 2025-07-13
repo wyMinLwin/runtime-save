@@ -1,4 +1,15 @@
 import { ExtendedWindow } from "../types";
+
+async function fallbackSave(filename: string, blob: Blob) {
+    // Fallback to <a download> for browsers without File System Access API
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 export async function browserSave(filename: string, content: Blob | string | Buffer) {
     // Normalize to Blob
     const blob =
@@ -12,30 +23,28 @@ export async function browserSave(filename: string, content: Blob | string | Buf
 
     // Prefer File System Access API if supported
     if (typeof (window as unknown as ExtendedWindow)?.showSaveFilePicker == "function") {
-        // Extract base MIME type
-        const baseMimeType = (blob.type || "application/octet-stream").split(";")[0];
+        try {
+            // Extract base MIME type
+            const baseMimeType = (blob.type || "application/octet-stream").split(";")[0];
 
-        const handle = await (window as unknown as ExtendedWindow).showSaveFilePicker({
-            suggestedName: filename,
-            types: [
-                {
-                    description: "File",
-                    accept: {
-                        [baseMimeType]: [`.${filename.split(".").pop()}`],
+            const handle = await (window as unknown as ExtendedWindow).showSaveFilePicker({
+                suggestedName: filename,
+                types: [
+                    {
+                        description: "File",
+                        accept: {
+                            [baseMimeType]: [`.${filename.split(".").pop()}`],
+                        },
                     },
-                },
-            ],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
+                ],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+        } catch {
+            fallbackSave(filename, blob);
+        }
     } else {
-        // Fallback to <a download> for browsers without File System Access API
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        fallbackSave(filename, blob);
     }
 }
