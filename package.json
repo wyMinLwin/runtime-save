@@ -15,7 +15,7 @@
         }
     },
     "type": "module",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "A JavaScript library to save files with runtime-awareness",
     "repository": {
         "type": "git",

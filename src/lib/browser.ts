@@ -22,8 +22,8 @@ export async function browserSave(filename: string, content: Blob | string | Buf
                 })();
 
     // Prefer File System Access API if supported
-    if (typeof (window as unknown as ExtendedWindow)?.showSaveFilePicker == "function") {
-        try {
+    try {
+        if (typeof (window as unknown as ExtendedWindow)?.showSaveFilePicker == "function") {
             // Extract base MIME type
             const baseMimeType = (blob.type || "application/octet-stream").split(";")[0];
 
@@ -41,10 +41,10 @@ export async function browserSave(filename: string, content: Blob | string | Buf
             const writable = await handle.createWritable();
             await writable.write(blob);
             await writable.close();
-        } catch {
+        } else {
             fallbackSave(filename, blob);
         }
-    } else {
+    } catch {
         fallbackSave(filename, blob);
     }
 }
